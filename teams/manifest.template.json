@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.19",
+  "version": "0.1.0",
+  "id": "{{TEAMS_APP_ID}}",
+  "developer": {
+    "name": "Intern møteagent",
+    "websiteUrl": "https://{{APP_HOST}}/privacy.html",
+    "privacyUrl": "https://{{APP_HOST}}/privacy.html",
+    "termsOfUseUrl": "https://{{APP_HOST}}/terms.html"
+  },
+  "name": {
+    "short": "Møteagent",
+    "full": "Intern møteagent og chatmoderator"
+  },
+  "description": {
+    "short": "Transkripsjon, referat og hjelp ved omtale.",
+    "full": "Intern møteagent som transkriberer møtelyd, lager AI-genererte referater og hjelper i chat når den blir omtalt. Møtearrangøren starter og stopper agenten."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#5650D8",
+  "bots": [
+    {
+      "botId": "{{BOT_ID}}",
+      "scopes": [
+        "personal",
+        "team",
+        "groupChat"
+      ],
+      "supportsFiles": false,
+      "isNotificationOnly": false,
+      "supportsCalling": true,
+      "supportsVideo": false,
+      "commandLists": [
+        {
+          "scopes": [
+            "team",
+            "groupChat",
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "hjelp",
+              "description": "Omtal agenten og skriv hva du trenger hjelp med."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://{{APP_HOST}}/configure.html",
+      "canUpdateConfiguration": true,
+      "scopes": [
+        "team",
+        "groupChat"
+      ],
+      "context": [
+        "channelTab",
+        "privateChatTab",
+        "meetingChatTab",
+        "meetingDetailsTab",
+        "meetingSidePanel"
+      ]
+    }
+  ],
+  "validDomains": [
+    "{{APP_HOST}}",
+    "token.botframework.com"
+  ],
+  "webApplicationInfo": {
+    "id": "{{BOT_ID}}",
+    "resource": "api://{{APP_HOST}}/{{BOT_ID}}"
+  }
+}

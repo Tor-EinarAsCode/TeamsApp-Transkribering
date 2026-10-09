@@ -1,0 +1,34 @@
+using TeamsAgent.Core;
+using Xunit;
+namespace TeamsAgent.Tests;
+public class LifecycleTests
+{
+    readonly Guid tenant = Guid.NewGuid(); readonly Guid organizer = Guid.NewGuid();
+    [Fact] public async Task NonOrganizerCannotStartOrStop() { var c = New(out _, out _); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => c.StartAsync(new(tenant, "m"), Guid.NewGuid(), new("url", "thread", organizer), default)); }
+    [Fact] public async Task DuplicateStartCreatesOneCall() { var c = New(out var con, out _); var k = new MeetingKey(tenant, "m"); await Task.WhenAll(c.StartAsync(k, organizer, new("url", "t", organizer), default), c.StartAsync(k, organizer, new("url", "t", organizer), default)); Assert.Equal(1, con.Joins); }
+    [Fact] public async Task TerminalSessionCannotRestartFromLateCallback() { var c = New(out _, out var s); var k = new MeetingKey(tenant, "m"); await c.StartAsync(k, organizer, new("url", "t", organizer), default); await c.StopAsync(k, organizer, default); await c.ApplyStateAsync(k, MeetingState.Transcribing, default); Assert.Equal(MeetingState.Stopped, (await s.GetAsync(k, default))!.State); }
+    [Fact] public async Task ForeignTenantIsRejected() { var c = New(out _, out _); await Assert.ThrowsAsync<UnauthorizedAccessException>(() => c.StartAsync(new(Guid.NewGuid(), "m"), organizer, new("url", "t", organizer), default)); }
+    [Fact] public async Task NewCoordinatorReusesExistingSession() { var c = New(out var con, out var s); var k = new MeetingKey(tenant, "m"); await c.StartAsync(k, organizer, new("url", "t", organizer), default); await new MeetingCoordinator(s, con, tenant).StartAsync(k, organizer, new("url", "t", organizer), default); Assert.Equal(1, con.Joins); }
+    [Fact] public async Task ExpiredContentCannotBeServed() { var s = new MemoryMeetingStore(); var k = new MeetingKey(tenant, "m"); await s.UpdateAsync(k, _ => Task.FromResult(new MeetingSession { Key = k, OrganizerId = organizer, Join = new("url", "t", organizer), Created = DateTimeOffset.UtcNow.AddDays(-31) }), default); var c = new MeetingCoordinator(s, new Connector(), tenant); await Assert.ThrowsAsync<InvalidOperationException>(() => c.StartAsync(k, organizer, new("url", "t", organizer), default)); }
+    [Fact] public async Task ConnectorDoesNotRunInsideDatabaseLock() { var store = new MemoryMeetingStore(); var k = new MeetingKey(tenant, "m"); var connector = new ReentrantConnector(store, k); var coordinator = new MeetingCoordinator(store, connector, tenant); await coordinator.StartAsync(k, organizer, new("url", "t", organizer), default).WaitAsync(TimeSpan.FromSeconds(1)); }
+    sealed class ReentrantConnector(IMeetingStore store, MeetingKey key) : IMeetingConnector { public async Task<string> JoinAsync(MeetingSession s, CancellationToken ct) { await store.UpdateAsync(key, x => Task.FromResult(x ?? s), ct); return "call"; } public Task StopAsync(MeetingSession s, CancellationToken ct) => Task.CompletedTask; }
+    [Fact] public void RestartDuringActiveMeetingRequiresRecovery() { var now = DateTimeOffset.UtcNow; var s = new MeetingSession { Key = new(tenant, "m"), OrganizerId = organizer, Join = new("u", "t", organizer), State = MeetingState.Transcribing, LastSeen = now.AddMinutes(-6) }; Assert.True(SessionRecovery.IsStale(s, now)); }
+    [Fact] public void LiveMeetingIsNotRecovered() { var now = DateTimeOffset.UtcNow; var s = new MeetingSession { Key = new(tenant, "m"), OrganizerId = organizer, Join = new("u", "t", organizer), State = MeetingState.Transcribing, LastSeen = now }; Assert.False(SessionRecovery.IsStale(s, now)); }
+    [Fact] public async Task DeletedSessionCannotBeRecreatedAfterStop() { var k = new MeetingKey(tenant, "m"); var s = new DeleteableStore(); var con = new DeleteOnStop(s); var c = new MeetingCoordinator(s, con, tenant); await c.StartAsync(k, organizer, new("u", "t", organizer), default); await Assert.ThrowsAsync<KeyNotFoundException>(() => c.StopAsync(k, organizer, default)); Assert.Null(await s.GetAsync(k, default)); }
+    sealed class DeleteableStore : IMeetingStore { public MeetingSession? Session; public Task<MeetingSession?> GetAsync(MeetingKey k, CancellationToken ct) => Task.FromResult(Session); public async Task<MeetingSession> UpdateAsync(MeetingKey k, Func<MeetingSession?, Task<MeetingSession>> f, CancellationToken ct) { Session = await f(Session); return Session; } }
+    sealed class DeleteOnStop(DeleteableStore store) : IMeetingConnector { public Task<string> JoinAsync(MeetingSession s, CancellationToken ct) => Task.FromResult("call"); public Task StopAsync(MeetingSession s, CancellationToken ct) { store.Session = null; return Task.CompletedTask; } }
+    MeetingCoordinator New(out Connector con, out MemoryMeetingStore s) { con = new(); s = new(); return new(s, con, tenant); }
+    public sealed class Connector : IMeetingConnector { public int Joins; public Task<string> JoinAsync(MeetingSession s, CancellationToken ct) { Interlocked.Increment(ref Joins); return Task.FromResult("call"); } public Task StopAsync(MeetingSession s, CancellationToken ct) => Task.CompletedTask; }
+}
+public sealed class MemoryMeetingStore : IMeetingStore
+{
+    readonly SemaphoreSlim mutex = new(1); readonly Dictionary<MeetingKey, MeetingSession> data = [];
+    public Task<MeetingSession?> GetAsync(MeetingKey k, CancellationToken ct) => Task.FromResult(data.GetValueOrDefault(k));
+    public async Task<MeetingSession> UpdateAsync(MeetingKey k, Func<MeetingSession?, Task<MeetingSession>> update, CancellationToken ct) { await mutex.WaitAsync(ct); try { var s = await update(data.GetValueOrDefault(k)); data[k] = s; return s; } finally { mutex.Release(); } }
+}
+public class AudioTests
+{
+    [Fact] public async Task UnconfirmedRecordingPersistsNothing() { var store = new Segments(); var k = new MeetingKey(Guid.NewGuid(), "m"); await new AudioPipeline(k, new(), store).PersistAsync(new("s", k, TimeSpan.Zero, TimeSpan.FromSeconds(1), "ukjent taler", "hei"), default); Assert.Empty(store.Items); }
+    [Fact] public async Task LostRecordingStateStopsPersistence() { var store = new Segments(); var k = new MeetingKey(Guid.NewGuid(), "m"); var gate = new RecordingGate(); gate.Confirm(); gate.Revoke(); await new AudioPipeline(k, gate, store).PersistAsync(new("s", k, TimeSpan.Zero, TimeSpan.FromSeconds(1), "ukjent taler", "hei"), default); Assert.Empty(store.Items); }
+    public sealed class Segments : ITranscriptStore { public List<TranscriptSegment> Items = []; public Task AppendAsync(TranscriptSegment s, CancellationToken ct) { if (!Items.Any(x => x.Id == s.Id)) Items.Add(s); return Task.CompletedTask; } public Task<IReadOnlyList<TranscriptSegment>> ReadAsync(MeetingKey k, CancellationToken ct) => Task.FromResult<IReadOnlyList<TranscriptSegment>>(Items); public Task MarkGapAsync(MeetingKey k, TimeSpan o, CancellationToken ct) => Task.CompletedTask; }
+}

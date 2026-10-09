@@ -1,0 +1,4 @@
+*.sln text eol=lf
+*.cs text eol=lf
+*.csproj text eol=lf
+*.png binary
