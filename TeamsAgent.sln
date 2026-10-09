@@ -1,0 +1,63 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8B5B5A62-9BB6-4797-BE40-6544570D8C61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsAgent.Core", "src\TeamsAgent.Core\TeamsAgent.Core.csproj", "{6A7770BE-55B2-46E8-AF21-5EE762A763C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsAgent.Persistence", "src\TeamsAgent.Persistence\TeamsAgent.Persistence.csproj", "{89B5AE59-8B5D-4EE1-932A-46B2965C5F7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsAgent.Worker", "src\TeamsAgent.Worker\TeamsAgent.Worker.csproj", "{2131361B-BE81-4C28-80B2-F863DB686A2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsAgent.MediaHost", "src\TeamsAgent.MediaHost\TeamsAgent.MediaHost.csproj", "{1985BE10-E32D-4BF3-AA70-ACCABC51E71B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{95884C27-2F55-4AD1-8DF4-F830D04F6658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsAgent.Tests", "tests\TeamsAgent.Tests\TeamsAgent.Tests.csproj", "{E4604ECC-D723-442D-9BC2-8AAB07868E38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamsAgent.Api", "src\TeamsAgent.Api\TeamsAgent.Api.csproj", "{B073EB00-7AAA-4F7E-A217-DF2F42808D08}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A7770BE-55B2-46E8-AF21-5EE762A763C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A7770BE-55B2-46E8-AF21-5EE762A763C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A7770BE-55B2-46E8-AF21-5EE762A763C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A7770BE-55B2-46E8-AF21-5EE762A763C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89B5AE59-8B5D-4EE1-932A-46B2965C5F7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89B5AE59-8B5D-4EE1-932A-46B2965C5F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89B5AE59-8B5D-4EE1-932A-46B2965C5F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89B5AE59-8B5D-4EE1-932A-46B2965C5F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2131361B-BE81-4C28-80B2-F863DB686A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2131361B-BE81-4C28-80B2-F863DB686A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2131361B-BE81-4C28-80B2-F863DB686A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2131361B-BE81-4C28-80B2-F863DB686A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1985BE10-E32D-4BF3-AA70-ACCABC51E71B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1985BE10-E32D-4BF3-AA70-ACCABC51E71B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1985BE10-E32D-4BF3-AA70-ACCABC51E71B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1985BE10-E32D-4BF3-AA70-ACCABC51E71B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4604ECC-D723-442D-9BC2-8AAB07868E38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4604ECC-D723-442D-9BC2-8AAB07868E38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4604ECC-D723-442D-9BC2-8AAB07868E38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4604ECC-D723-442D-9BC2-8AAB07868E38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B073EB00-7AAA-4F7E-A217-DF2F42808D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B073EB00-7AAA-4F7E-A217-DF2F42808D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B073EB00-7AAA-4F7E-A217-DF2F42808D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B073EB00-7AAA-4F7E-A217-DF2F42808D08}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6A7770BE-55B2-46E8-AF21-5EE762A763C2} = {8B5B5A62-9BB6-4797-BE40-6544570D8C61}
+		{89B5AE59-8B5D-4EE1-932A-46B2965C5F7D} = {8B5B5A62-9BB6-4797-BE40-6544570D8C61}
+		{2131361B-BE81-4C28-80B2-F863DB686A2F} = {8B5B5A62-9BB6-4797-BE40-6544570D8C61}
+		{1985BE10-E32D-4BF3-AA70-ACCABC51E71B} = {8B5B5A62-9BB6-4797-BE40-6544570D8C61}
+		{E4604ECC-D723-442D-9BC2-8AAB07868E38} = {95884C27-2F55-4AD1-8DF4-F830D04F6658}
+		{B073EB00-7AAA-4F7E-A217-DF2F42808D08} = {8B5B5A62-9BB6-4797-BE40-6544570D8C61}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,7 @@
+{
+ "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+ "contentVersion":"1.0.0.0",
+ "parameters":{
+  "prefix":{"value":"moteagent"},"tenantId":{"value":"REPLACE_TENANT_ID"},"clientId":{"value":"REPLACE_BOT_APP_ID"},"mediaClientId":{"value":"REPLACE_MEDIA_API_APP_ID"},"entraAdminObjectId":{"value":"REPLACE_SQL_ENTRA_ADMIN_OID"},"entraAdminName":{"value":"REPLACE_SQL_ADMIN_NAME"},"senderMailbox":{"value":"REPLACE_MAILBOX"},"mediaFqdn":{"value":"REPLACE_MEDIA_DNS"},"certificateThumbprint":{"value":"REPLACE_CERTIFICATE_THUMBPRINT"},"vmAdminPassword":{"reference":{"keyVault":{"id":"REPLACE_EXISTING_DEPLOYMENT_VAULT_ID"},"secretName":"media-vm-password"}},"clientSecret":{"reference":{"keyVault":{"id":"REPLACE_EXISTING_DEPLOYMENT_VAULT_ID"},"secretName":"bot-client-secret"}}
+ }
+}
